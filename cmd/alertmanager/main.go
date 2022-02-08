@@ -16,6 +16,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/prometheus/alertmanager/notify/iAlarm"
 	"net"
 	"net/http"
 	"net/url"
@@ -48,7 +49,6 @@ import (
 	"github.com/prometheus/alertmanager/nflog"
 	"github.com/prometheus/alertmanager/notify"
 	"github.com/prometheus/alertmanager/notify/email"
-	"github.com/prometheus/alertmanager/notify/internal"
 	"github.com/prometheus/alertmanager/notify/opsgenie"
 	"github.com/prometheus/alertmanager/notify/pagerduty"
 	"github.com/prometheus/alertmanager/notify/pushover"
@@ -141,7 +141,7 @@ func buildReceiverIntegrations(nc *config.Receiver, tmpl *template.Template, log
 
 	// 注入内部报警
 	add("webhook", 0, nc.InternalAlarmConfig, func(l log.Logger) (notify.Notifier, error) {
-		return internal.New(nc.InternalAlarmConfig, tmpl, l)
+		return iAlarm.New(nc.InternalAlarmConfig, tmpl, l)
 	})
 
 	for i, c := range nc.WebhookConfigs {
@@ -191,7 +191,7 @@ func run() int {
 		alertGCInterval = kingpin.Flag("alerts.gc-interval", "Interval between alert GC.").Default("30m").Duration()
 
 		externalURL    = kingpin.Flag("web.external-url", "The URL under which Alertmanager is externally reachable (for example, if Alertmanager is served via a reverse proxy). Used for generating relative and absolute links back to Alertmanager itself. If the URL has a path portion, it will be used to prefix all HTTP endpoints served by Alertmanager. If omitted, relevant URL components will be derived automatically.").String()
-		routePrefix    = kingpin.Flag("web.route-prefix", "Prefix for the internal routes of web endpoints. Defaults to path of --web.external-url.").String()
+		routePrefix    = kingpin.Flag("web.route-prefix", "Prefix for the iAlarm routes of web endpoints. Defaults to path of --web.external-url.").String()
 		listenAddress  = kingpin.Flag("web.listen-address", "Address to listen on for the web interface and API.").Default(":9093").String()
 		getConcurrency = kingpin.Flag("web.get-concurrency", "Maximum number of GET requests processed concurrently. If negative or zero, the limit is GOMAXPROC or 8, whichever is larger.").Default("0").Int()
 		httpTimeout    = kingpin.Flag("web.timeout", "Timeout for HTTP requests. If negative or zero, no timeout is set.").Default("0").Duration()

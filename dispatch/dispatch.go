@@ -188,7 +188,7 @@ func (ag AlertGroups) Less(i, j int) bool {
 }
 func (ag AlertGroups) Len() int { return len(ag) }
 
-// Groups returns a slice of AlertGroups from the dispatcher's internal state.
+// Groups returns a slice of AlertGroups from the dispatcher's iAlarm state.
 func (d *Dispatcher) Groups(routeFilter func(*Route) bool, alertFilter func(*types.Alert, time.Time) bool) (AlertGroups, map[model.Fingerprint][]string) {
 	groups := AlertGroups{}
 

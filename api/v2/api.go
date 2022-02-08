@@ -732,7 +732,7 @@ func (api *API) postSilencesHandler(params silence_ops.PostSilencesParams) middl
 	if err != nil {
 		level.Error(logger).Log("msg", "Failed to marshal silence to proto", "err", err)
 		return silence_ops.NewPostSilencesBadRequest().WithPayload(
-			fmt.Sprintf("failed to convert API silence to internal silence: %v", err.Error()),
+			fmt.Sprintf("failed to convert API silence to iAlarm silence: %v", err.Error()),
 		)
 	}
 

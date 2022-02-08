@@ -785,7 +785,7 @@ func (s *Silences) loadSnapshot(r io.Reader) error {
 	return nil
 }
 
-// Snapshot writes the full internal state into the writer and returns the number of bytes
+// Snapshot writes the full iAlarm state into the writer and returns the number of bytes
 // written.
 func (s *Silences) Snapshot(w io.Writer) (int64, error) {
 	start := time.Now()

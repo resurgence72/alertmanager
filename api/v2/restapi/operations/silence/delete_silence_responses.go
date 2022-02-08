@@ -70,13 +70,13 @@ func NewDeleteSilenceInternalServerError() *DeleteSilenceInternalServerError {
 	return &DeleteSilenceInternalServerError{}
 }
 
-// WithPayload adds the payload to the delete silence internal server error response
+// WithPayload adds the payload to the delete silence iAlarm server error response
 func (o *DeleteSilenceInternalServerError) WithPayload(payload string) *DeleteSilenceInternalServerError {
 	o.Payload = payload
 	return o
 }
 
-// SetPayload sets the payload to the delete silence internal server error response
+// SetPayload sets the payload to the delete silence iAlarm server error response
 func (o *DeleteSilenceInternalServerError) SetPayload(payload string) {
 	o.Payload = payload
 }

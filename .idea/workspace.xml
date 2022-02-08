@@ -15,6 +15,9 @@
     </option>
   </component>
   <component name="GOROOT" path="C:/Program Files/Go" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="GoLibraries">
     <option name="indexEntireGoPath" value="false" />
   </component>
@@ -23,6 +26,7 @@
     <setting file="file://$PROJECT_DIR$/cluster/channel.go" root0="SKIP_INSPECTION" />
   </component>
   <component name="ProjectId" id="22gAQkVzyMsitwz0y9RLS3VgOu7" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />

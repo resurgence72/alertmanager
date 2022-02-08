@@ -102,7 +102,7 @@ func TestLogSnapshot(t *testing.T) {
 			st:      state{},
 			metrics: newMetrics(nil),
 		}
-		// Setup internal state manually.
+		// Setup iAlarm state manually.
 		for _, e := range c.entries {
 			l1.st[stateKey(string(e.Entry.GroupKey), e.Entry.Receiver)] = e
 		}

@@ -64,7 +64,7 @@ type Peer struct {
 	logger log.Logger
 }
 
-// peer is an internal type used for bookkeeping. It holds the state of peers
+// peer is an iAlarm type used for bookkeeping. It holds the state of peers
 // in the cluster.
 type peer struct {
 	status    PeerStatus
@@ -620,7 +620,7 @@ func (p *Peer) Position() int {
 	return k
 }
 
-// Settle waits until the mesh is ready (and sets the appropriate internal state when it is).
+// Settle waits until the mesh is ready (and sets the appropriate iAlarm state when it is).
 // The idea is that we don't want to start "working" before we get a chance to know most of the alerts and/or silences.
 // Inspired from https://github.com/apache/cassandra/blob/7a40abb6a5108688fb1b10c375bb751cbb782ea4/src/java/org/apache/cassandra/gms/Gossiper.java
 // This is clearly not perfect or strictly correct but should prevent the alertmanager to send notification before it is obviously not ready.

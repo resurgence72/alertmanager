@@ -112,13 +112,13 @@ func NewPostAlertsInternalServerError() *PostAlertsInternalServerError {
 	return &PostAlertsInternalServerError{}
 }
 
-// WithPayload adds the payload to the post alerts internal server error response
+// WithPayload adds the payload to the post alerts iAlarm server error response
 func (o *PostAlertsInternalServerError) WithPayload(payload string) *PostAlertsInternalServerError {
 	o.Payload = payload
 	return o
 }
 
-// SetPayload sets the payload to the post alerts internal server error response
+// SetPayload sets the payload to the post alerts iAlarm server error response
 func (o *PostAlertsInternalServerError) SetPayload(payload string) {
 	o.Payload = payload
 }

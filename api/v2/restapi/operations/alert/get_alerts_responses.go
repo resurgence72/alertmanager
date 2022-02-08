@@ -137,13 +137,13 @@ func NewGetAlertsInternalServerError() *GetAlertsInternalServerError {
 	return &GetAlertsInternalServerError{}
 }
 
-// WithPayload adds the payload to the get alerts internal server error response
+// WithPayload adds the payload to the get alerts iAlarm server error response
 func (o *GetAlertsInternalServerError) WithPayload(payload string) *GetAlertsInternalServerError {
 	o.Payload = payload
 	return o
 }
 
-// SetPayload sets the payload to the get alerts internal server error response
+// SetPayload sets the payload to the get alerts iAlarm server error response
 func (o *GetAlertsInternalServerError) SetPayload(payload string) {
 	o.Payload = payload
 }

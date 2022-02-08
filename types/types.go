@@ -287,7 +287,7 @@ func (e *MultiError) Len() int {
 }
 
 // Errors returns the errors added to the MuliError. The returned slice is a
-// copy of the internal slice of errors.
+// copy of the iAlarm slice of errors.
 func (e *MultiError) Errors() []error {
 	e.mtx.Lock()
 	defer e.mtx.Unlock()
@@ -307,7 +307,7 @@ func (e *MultiError) Error() string {
 }
 
 // Alert wraps a model.Alert with additional information relevant
-// to internal of the Alertmanager.
+// to iAlarm of the Alertmanager.
 // The type is never exposed to external communication and the
 // embedded alert has to be sanitized beforehand.
 type Alert struct {
@@ -344,7 +344,7 @@ func (as AlertSlice) Less(i, j int) bool {
 func (as AlertSlice) Swap(i, j int) { as[i], as[j] = as[j], as[i] }
 func (as AlertSlice) Len() int      { return len(as) }
 
-// Alerts turns a sequence of internal alerts into a list of
+// Alerts turns a sequence of iAlarm alerts into a list of
 // exposable model.Alert structures.
 func Alerts(alerts ...*Alert) model.Alerts {
 	res := make(model.Alerts, 0, len(alerts))

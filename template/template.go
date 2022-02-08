@@ -289,7 +289,7 @@ func (t *Template) Data(recv string, groupLabels model.LabelSet, alerts ...*type
 		ExternalURL:       t.ExternalURL.String(),
 	}
 
-	// The call to types.Alert is necessary to correctly resolve the internal
+	// The call to types.Alert is necessary to correctly resolve the iAlarm
 	// representation to the user representation.
 	for _, a := range types.Alerts(alerts...) {
 		alert := Alert{

@@ -142,7 +142,7 @@ func TestSilencesSnapshot(t *testing.T) {
 		require.NoError(t, err, "creating temp file failed")
 
 		s1 := &Silences{st: state{}, metrics: newMetrics(nil, nil)}
-		// Setup internal state manually.
+		// Setup iAlarm state manually.
 		for _, e := range c.entries {
 			s1.st[e.Silence.Id] = e
 		}

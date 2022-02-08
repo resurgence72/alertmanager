@@ -116,13 +116,13 @@ func NewGetSilenceInternalServerError() *GetSilenceInternalServerError {
 	return &GetSilenceInternalServerError{}
 }
 
-// WithPayload adds the payload to the get silence internal server error response
+// WithPayload adds the payload to the get silence iAlarm server error response
 func (o *GetSilenceInternalServerError) WithPayload(payload string) *GetSilenceInternalServerError {
 	o.Payload = payload
 	return o
 }
 
-// SetPayload sets the payload to the get silence internal server error response
+// SetPayload sets the payload to the get silence iAlarm server error response
 func (o *GetSilenceInternalServerError) SetPayload(payload string) {
 	o.Payload = payload
 }
