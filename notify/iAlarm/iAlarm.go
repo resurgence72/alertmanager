@@ -117,23 +117,33 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*types.Alert) (bool, er
 		ReportTime: 1590733343156,
 	}
 	// 1. 拿到所有的 rule 请求解析获取真正的参数
-	// 使用写死的内部网关
+	// TODO 目前使用写死的内部网关
 	InternalGateWay := "http://g-kong.17zuoye.net/live-manage-production.baize-serve/live/manage/baize/v1/case/detail?case_id="
 
 	var buf bytes.Buffer
 
 	// 构建当前所有alert
 	for _, alert := range msg.Alerts {
-		buf.WriteString(fmt.Sprintf("状态: [%s]\n", alert.Status))
-		buf.WriteString(fmt.Sprintf("开始时间: [%s]\n", alert.StartsAt))
-		buf.WriteString(fmt.Sprintf("结束时间: [%s]\n", alert.EndsAt))
-		buf.WriteString("标签:\n")
-		for k, v := range alert.Labels {
+		labels := alert.Labels
+		annotations := alert.Annotations
+
+		buf.WriteString(fmt.Sprintf("报警状态: [%s]\n", wrapAlert(alert.Status)))
+		buf.WriteString(fmt.Sprintf("报警instance: [%s]\n", labels["instance"]))
+		buf.WriteString(fmt.Sprintf("报警名称: [%s]\n", labels["alertname"]))
+		buf.WriteString(fmt.Sprintf("报警开始时间: [%s]\n", alert.StartsAt))
+
+		// 删除已经写入的标签
+		delete(labels, "instance")
+		delete(labels, "alertname")
+
+		buf.WriteString("报警注解:\n")
+		for k, v := range annotations {
 			buf.WriteString(fmt.Sprintf(" %s: %s\n", k, v))
 		}
-		buf.WriteString("注解:\n")
-		for k, v := range alert.Annotations {
-			buf.WriteString(fmt.Sprintf(" %s: %s\n", k, v))
+
+		buf.WriteString("报警标签:\n")
+		for k, v := range labels {
+			buf.WriteString(fmt.Sprintf(" [%s]   [%s]\n", k, v))
 		}
 		buf.WriteString("\n\n")
 	}
@@ -183,4 +193,23 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*types.Alert) (bool, er
 		}
 	}
 	return true, nil
+}
+
+func wrapAlert(title string) string {
+	switch title {
+	case "firing":
+		return wrapFiringAlert(title)
+	case "resolved":
+		return wrapResolvedAlert(title)
+	default:
+		return wrapFiringAlert(title)
+	}
+}
+
+func wrapFiringAlert(title string) string {
+	return fmt.Sprintf("<font color='red'>%s</font>", title)
+}
+
+func wrapResolvedAlert(title string) string {
+	return fmt.Sprintf("<font color='green'>%s</font>", title)
 }
