@@ -95,6 +95,7 @@ type RuleRequest struct {
 // 定义 Notify 函数
 func (n *Notifier) Notify(ctx context.Context, alerts ...*types.Alert) (bool, error) {
 
+	level.Info(n.logger).Log("自定义notify收到报警条数", len(alerts))
 	// 核心 构建发送的结构体
 	data := notify.GetTemplateData(ctx, n.tmpl, alerts, n.logger)
 
@@ -110,12 +111,6 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*types.Alert) (bool, er
 		GroupKey: groupKey.String(),
 	}
 
-	// 发送 msg 消息
-	ruleReq := &RuleRequest{
-		Level:      "info",
-		Subject:    "AlertManager报警",
-		ReportTime: 1590733343156,
-	}
 	// 1. 拿到所有的 rule 请求解析获取真正的参数
 	// TODO 目前使用写死的内部网关
 	InternalGateWay := "http://g-kong.17zuoye.net/live-manage-production.baize-serve/live/manage/baize/v1/case/detail?case_id="
@@ -128,7 +123,7 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*types.Alert) (bool, er
 		annotations := alert.Annotations
 
 		buf.WriteString(fmt.Sprintf("报警状态: [%s]\n", wrapAlert(alert.Status)))
-		buf.WriteString(fmt.Sprintf("报警instance: [%s]\n", labels["instance"]))
+		buf.WriteString(fmt.Sprintf("报警实例: [%s]\n", labels["instance"]))
 		buf.WriteString(fmt.Sprintf("报警名称: [%s]\n", labels["alertname"]))
 		buf.WriteString(fmt.Sprintf("报警开始时间: [%s]\n", alert.StartsAt))
 
@@ -138,12 +133,12 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*types.Alert) (bool, er
 
 		buf.WriteString("报警注解:\n")
 		for k, v := range annotations {
-			buf.WriteString(fmt.Sprintf(" %s: %s\n", k, v))
+			buf.WriteString(fmt.Sprintf("   [%s]   [%s]\n", k, v))
 		}
 
 		buf.WriteString("报警标签:\n")
 		for k, v := range labels {
-			buf.WriteString(fmt.Sprintf(" [%s]   [%s]\n", k, v))
+			buf.WriteString(fmt.Sprintf("   [%s]   [%s]\n", k, v))
 		}
 		buf.WriteString("\n\n")
 	}
@@ -163,34 +158,49 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*types.Alert) (bool, er
 		// 真正发起请求
 		resp, err := n.client.Do(req.WithContext(ctx))
 		if err != nil {
+			level.Error(n.logger).Log("rule_key 请求失败", err)
 			continue
 		}
 
 		var respBytes []byte
 		if respBytes, err = ioutil.ReadAll(resp.Body); err != nil {
+			level.Error(n.logger).Log("rule_key ReadAll", err)
 			continue
 		}
 
 		ri := new(RuleInstance)
 		if err := json.Unmarshal(respBytes, ri); err != nil {
+			level.Error(n.logger).Log("RuleInstance Unmarshal", err)
 			continue
 		}
 
 		// 2. 拿到参数去请求真正的报警
+		// 发送 msg 消息
+		ruleReq := &RuleRequest{
+			Level:      "info",
+			Subject:    "AlertManager报警",
+			ReportTime: 1590733343156,
+		}
 		ruleReq.Main = ri.Data.Main
 		ruleReq.Env = ri.Data.Env
 		ruleReq.Sub = ri.Data.Sub
 		ruleReq.Body = buf.String()
 
-		alertBytes, err := json.Marshal(ruleReq)
+		alertBytes, err := json.Marshal([]*RuleRequest{ruleReq})
 		if err != nil {
+			level.Error(n.logger).Log("alertBytes Marshal", err)
 			continue
 		}
+		level.Info(n.logger).Log("alert构建结果", string(alertBytes))
 
-		_, err = http.Post(n.conf.URL.String(), "application/json", bytes.NewBuffer(alertBytes))
+		resp, err = http.Post(n.conf.URL.String(), "application/json", bytes.NewBuffer(alertBytes))
 		if err != nil {
+			level.Error(n.logger).Log("最终发送失败", err)
 			return true, err
 		}
+		level.Info(n.logger).Log("最终发送状态", resp.Status)
+
+		notify.Drain(resp)
 	}
 	return true, nil
 }
