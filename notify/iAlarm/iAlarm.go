@@ -20,16 +20,15 @@ import (
 	"fmt"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
+	"github.com/prometheus/alertmanager/config"
+	"github.com/prometheus/alertmanager/notify"
+	"github.com/prometheus/alertmanager/template"
 	"github.com/prometheus/alertmanager/types"
 	commoncfg "github.com/prometheus/common/config"
 	"github.com/prometheus/common/version"
 	"io"
 	"io/ioutil"
 	"net/http"
-
-	"github.com/prometheus/alertmanager/config"
-	"github.com/prometheus/alertmanager/notify"
-	"github.com/prometheus/alertmanager/template"
 )
 
 // 定义 http header
@@ -123,9 +122,20 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*types.Alert) (bool, er
 		annotations := alert.Annotations
 
 		buf.WriteString(fmt.Sprintf("报警状态: [%s]\n", wrapAlert(alert.Status)))
-		buf.WriteString(fmt.Sprintf("报警实例: [%s]\n", labels["instance"]))
+		if instance, ok := labels["instance"]; ok && instance != "" {
+			buf.WriteString(fmt.Sprintf("报警实例: [%s]\n", labels["instance"]))
+		}
 		buf.WriteString(fmt.Sprintf("报警名称: [%s]\n", labels["alertname"]))
-		buf.WriteString(fmt.Sprintf("报警开始时间: [%s]\n", alert.StartsAt))
+
+		localStartTime := alert.StartsAt.Local().Format("2006-01-02 15:04:05")
+		buf.WriteString(fmt.Sprintf("报警开始时间: [%s]\n", localStartTime))
+
+		if !alert.EndsAt.IsZero() {
+			// 构建结束时间
+			localEndTime := alert.EndsAt.Local().Format("2006-01-02 15:04:05")
+			buf.WriteString(fmt.Sprintf("报警结束时间: [%s]\n", localEndTime))
+			buf.WriteString(fmt.Sprintf("报警持续时间: [%s]\n", alert.EndsAt.Sub(alert.StartsAt).String()))
+		}
 
 		// 删除已经写入的标签
 		delete(labels, "instance")
